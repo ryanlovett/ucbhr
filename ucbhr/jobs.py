@@ -42,7 +42,7 @@ async def get_jobs(app_id, app_key, identifier, id_type):
     uri = employees_uri + f"/{identifier}/jobs"
     logger.debug(f"get_jobs: {uri} {params}")
     jobs = await get_hr_items(uri, params, headers, 'jobs')
-    logger.debug(f'jobs: {jobs}')
+    logger.info(f'jobs: {jobs}')
     return jobs
 
 def job_code(job):
