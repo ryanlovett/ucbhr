@@ -44,6 +44,12 @@ async def get_jobs(app_id, app_key, identifier, id_type):
     jobs = await get_hr_items(uri, params, headers, 'jobs')
     return jobs
 
+def job_code(job):
+    return job['position']['jobCode']['code']['code']
+
+def job_description(job):
+    return job['position']['jobCode']['code']['description']
+
 def job_department_code(job):
     return job['department']['code']
 
