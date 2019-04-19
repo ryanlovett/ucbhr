@@ -7,7 +7,7 @@ from tornado import httpclient
 from tornado.httputil import url_concat
 
 # logging
-logging.basicConfig(stream=sys.stdout, level=logging.WARNING)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Various SIS endpoints
@@ -42,6 +42,7 @@ async def get_jobs(app_id, app_key, identifier, id_type):
     uri = employees_uri + f"/{identifier}/jobs"
     logger.debug(f"get_jobs: {uri} {params}")
     jobs = await get_hr_items(uri, params, headers, 'jobs')
+    logger.debug(f'jobs: {jobs}')
     return jobs
 
 def job_code(job):
