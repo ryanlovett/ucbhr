@@ -9,7 +9,7 @@ import logging
 import os
 import sys
 
-from ucbhr import ucbhr
+from ucbhr import jobs
 
 # We use f-strings from python >= 3.6.
 assert sys.version_info >= (3, 7)
@@ -141,9 +141,8 @@ async def main():
     credentials = read_credentials(args.credentials)
     
     if args.command == 'jobs':
-        jobs = await ucbhr.get_jobs(credentials['app_id'], credentials['app_key'],
-            args.identifier, args.type)
-        print(jobs)
+        print(await jobs.get_jobs(credentials['app_id'], credentials['app_key'],
+            args.identifier, args.type))
 
 def run():
     asyncio.run(main())
