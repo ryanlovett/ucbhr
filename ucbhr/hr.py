@@ -59,3 +59,17 @@ def job_department_code(job):
 
 def job_department_description(job):
     return job['department']['description']
+
+async def get_info(app_id, app_key, identifier, id_type):
+    '''Given a campus-uid return the jobs.'''
+    url = f"{employees_url}/{identifier}/jobs"
+    headers = {
+        "Accept": "application/json",
+        "app_id": app_id,
+        "app_key": app_key
+    }
+    params = { "id-type": id_type }
+    logger.debug(f"get_info: {url} {params}")
+    data = await get_hr_items(url, params, headers)
+    logger.debug(f'info: {data}')
+    return data
