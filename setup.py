@@ -9,7 +9,7 @@ setuptools.setup(
 	author_email='rylo@berkeley.edu',
 	packages=setuptools.find_packages(),
 	install_requires=[
-	  'requests'
+	  'aiohttp'
 	],
     entry_points={
         'console_scripts': [

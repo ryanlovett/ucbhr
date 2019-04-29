@@ -2,9 +2,7 @@
 import logging
 import sys
 
-from tornado import escape
-from tornado import httpclient
-from tornado.httputil import url_concat
+import aiohttp
 
 # logging
 logging.basicConfig(stream=sys.stdout, level=logging.NOTSET)
@@ -13,20 +11,27 @@ logger = logging.getLogger(__name__)
 # Various SIS endpoints
 employees_url = "https://apis.berkeley.edu/hr/v3/employees"
 
-async def get_hr_items(url, params, headers, item_type):
+async def get_hr_items(url, params, headers, item_type=None):
     '''Get a list of items (enrollments, ) from the SIS.'''
-    http_client = httpclient.AsyncHTTPClient()
-    response = await http_client.fetch(url_concat(url, params), headers=headers)
-    data = escape.json_decode(response.body)
+    logger.info(f"getting {item_type}")
+
+    data = []
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers, params=params) as r:
+            if r.status == 404:
+                return []
+            data = await r.json()
 
     # return if there is no response in the data (e.g. 404)
     if 'response' not in data or len(data['response']) == 0:
         logger.warn('No response in data')
-        return[]
+        return data
     # return if the item_type has no items
+    elif item_type is None:
+        return data['response'][0]
     elif item_type not in data['response'][0]:
         logger.warn(f'No {item_type}')
-        return []
+        return data
     return data['response'][0][item_type]
 
 async def get_jobs(app_id, app_key, identifier, id_type):

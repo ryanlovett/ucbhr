@@ -17,7 +17,6 @@ assert sys.version_info >= (3, 7)
 # logging
 logging.basicConfig(stream=sys.stdout, level=logging.WARNING)
 logger = logging.getLogger('ucbhr')
-#logger.setLevel(logging.DEBUG)
 
 secret_keys = [ 'app_id',  'app_key' ]
 
