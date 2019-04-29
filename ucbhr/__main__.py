@@ -9,7 +9,7 @@ import logging
 import os
 import sys
 
-from ucbhr import jobs
+from ucbhr import hr
 
 # We use f-strings from python >= 3.6.
 assert sys.version_info >= (3, 7)
@@ -141,7 +141,7 @@ async def main():
     credentials = read_credentials(args.credentials)
     
     if args.command == 'jobs':
-        print(await jobs.get_jobs(credentials['app_id'], credentials['app_key'],
+        print(await hr.get_jobs(credentials['app_id'], credentials['app_key'],
             args.identifier, args.type))
 
 def run():
