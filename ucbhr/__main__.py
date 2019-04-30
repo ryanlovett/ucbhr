@@ -44,7 +44,7 @@ async def main():
     parser = argparse.ArgumentParser(
         description="Get data from UC Berkeley's HRMS")
     parser.add_argument('-f', dest='credentials', default='ucbhr.json',
-        help='credentials file.')
+        help='api credentials file')
     parser.add_argument('-i', dest='identifier', required=True,
         help='number uniquely identifying employee')
     parser.add_argument('-t', dest='type', required=True,

@@ -20,7 +20,7 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f CREDENTIALS        credentials file.
+  -f CREDENTIALS        api credentials file
   -i IDENTIFIER         number uniquely identifying employee
   -t {campus-uid,hr-employee-id,legacy-hr-employee-id}
                         id type
@@ -30,11 +30,10 @@ optional arguments:
 
 Example
 -------
-Get waitlisted IDs for a lab section in summer 2019:
-
-`ucbhr -d -i 12345 -t campus-uid jobs`
-
 Get job data for person with campus UID 12345.
+
+`ucbhr -i 12345 -t campus-uid jobs`
+
 
 API Access
 ----------
