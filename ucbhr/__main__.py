@@ -9,13 +9,13 @@ import logging
 import os
 import sys
 
-from ucbhr import hr
+from ucbhr import jobs, hr, info
 
 # We use f-strings from python >= 3.6.
 assert sys.version_info >= (3, 7)
 
 # logging
-logging.basicConfig(stream=sys.stdout, level=logging.WARNING)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger('ucbhr')
 
 secret_keys = [ 'app_id',  'app_key' ]
