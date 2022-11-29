@@ -11,7 +11,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Various SIS endpoints
-employees_url = "https://apis.berkeley.edu/hr/v3/employees"
+employees_url = "https://gateway.api.berkeley.edu/hr/v3/employees"
 
 async def get_hr_items(url, params, headers, item_type=None):
     '''Get a list of items (enrollments, ) from the SIS.'''
