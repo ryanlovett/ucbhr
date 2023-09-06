@@ -33,3 +33,6 @@ def department_code(job):
 
 def department_description(job):
     return jmespath.search("department.description", job)
+
+def status(job):
+    return jmespath.search("position.jobCode.status.description", job)

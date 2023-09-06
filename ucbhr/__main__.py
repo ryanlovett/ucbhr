@@ -61,7 +61,7 @@ async def main():
 
     emails_parser = subparsers.add_parser('emails', help="Get employee's emails.")
     emails_parser.add_argument('-c', dest='code', 
-        choices=['BUSN'], default='BUSN', help='email type code')
+        choices=['BUSN', 'ALL'], default='BUSN', help='email type code')
 
     args = parser.parse_args()
     
@@ -80,12 +80,16 @@ async def main():
             code = jobs.code(job)
             desc = jobs.description(job)
             dept_code = jobs.department_code(job)
-            print(f"{dept_code}\t{code}\t{desc}")
+            status = jobs.status(job)
+            print(f"{dept_code}\t{code}\t{desc}\t{status}")
 
     elif args.command == 'emails':
         items = await info.get(credentials['app_id'], credentials['app_key'],
                 args.identifier, args.type)
-        for email in info.emails(items, args.code): print(email)
+        logger.debug(items)
+        code = args.code
+        if code == 'ALL': code = None
+        for email in info.emails(items, code): print(email)
 
 def run():
     asyncio.run(main())
