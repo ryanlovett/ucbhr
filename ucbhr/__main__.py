@@ -35,6 +35,9 @@ def read_json_data(filename, required_keys):
         raise Exception(s)
     return data
 
+def print_json(items):
+    print(json.dumps(items, ensure_ascii=False, indent=4))
+
 def read_credentials(filename, required_keys=secret_keys):
     '''Read credentials from {filename}. Returns a dict.'''
     return read_json_data(filename, required_keys)
@@ -54,6 +57,8 @@ async def main():
         help='set info log level')
     parser.add_argument('-d', dest='debug', action='store_true',
         help='set debug log level')
+    parser.add_argument('--json', dest='as_json', action='store_true',
+        help='output items as JSON')
 
     subparsers = parser.add_subparsers(dest='command')
 
@@ -62,6 +67,8 @@ async def main():
     emails_parser = subparsers.add_parser('emails', help="Get employee's emails.")
     emails_parser.add_argument('-c', dest='code', 
         choices=['BUSN', 'ALL'], default='BUSN', help='email type code')
+
+    info_parser = subparsers.add_parser('info', help="Get employee's info.")
 
     args = parser.parse_args()
     
@@ -76,20 +83,33 @@ async def main():
     if args.command == 'jobs':
         items = await jobs.get(credentials['app_id'], credentials['app_key'],
                 args.identifier, args.type)
-        for job in items:
-            code = jobs.code(job)
-            desc = jobs.description(job)
-            dept_code = jobs.department_code(job)
-            status = jobs.status(job)
-            print(f"{dept_code}\t{code}\t{desc}\t{status}")
+        if args.as_json:
+            print_json(items)
+        else:
+            for job in items:
+                code = jobs.code(job)
+                desc = jobs.description(job)
+                dept_code = jobs.department_code(job)
+                status = jobs.status(job)
+                print(f"{dept_code}\t{code}\t{desc}\t{status}")
 
     elif args.command == 'emails':
         items = await info.get(credentials['app_id'], credentials['app_key'],
                 args.identifier, args.type)
         logger.debug(items)
-        code = args.code
-        if code == 'ALL': code = None
-        for email in info.emails(items, code): print(email)
+        if args.as_json:
+            print_json(items.get("emails", {}))
+        else:
+            code = args.code
+            if code == 'ALL': code = None
+            for email in info.emails(items, code):
+                print(email)
+
+    elif args.command == 'info':
+        items = await info.get(credentials['app_id'], credentials['app_key'],
+                args.identifier, args.type)
+        logger.debug(items)
+        print_json(items)
 
 def run():
     asyncio.run(main())
