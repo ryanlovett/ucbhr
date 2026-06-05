@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ucbhr"
+version = "0.2"
+description = "Query the UC Berkeley HRMS."
+authors = [
+    { name = "Ryan Lovett", email = "rylo@berkeley.edu" },
+]
+requires-python = ">=3.7"
+dependencies = [
+    "aiohttp",
+]
+
+[project.urls]
+Homepage = "https://github.com/ryanlovett/ucbhr"
+
+[project.scripts]
+ucbhr = "ucbhr.__main__:run"
