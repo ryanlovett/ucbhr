@@ -33,8 +33,9 @@ async def get_employees(app_id, app_key, dept_code, job_types=None, hr_status="A
     logger.debug(f'employees: {data}')
     return data
 
-def extract_campus_uids(employees_response):
-    '''Extract campus-uid values from the employee list response.'''
+def extract_identifiers(employees_response, id_type):
+    '''Extract id values of the given type from the employee list response.'''
     if not employees_response:
         return []
-    return jmespath.search("response[].identifiers[?type=='campus-uid'].id", employees_response) or []
+    query = f"response[].identifiers[?type=='{id_type}'].id[]"
+    return jmespath.search(query, employees_response) or []

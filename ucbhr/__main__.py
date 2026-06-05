@@ -186,6 +186,12 @@ async def main():
         dest="job_types",
         help="Comma-separated PPS appointment type codes",
     )
+    departments_parser.add_argument(
+        "--identifier-type",
+        dest="id_type",
+        choices=["hr-employee-id", "campus-uid", "calnet-id", "campus-solutions-id"],
+        help="Extract a specific identifier type from each employee",
+    )
 
     args = parser.parse_args()
 
@@ -202,12 +208,16 @@ async def main():
             args.dept_code,
             args.job_types,
         )
-        uids = departments.extract_campus_uids(employees)
-        if args.as_json:
-            print_json(uids)
+        response_data = employees.get("response", [])
+        if args.id_type:
+            ids = departments.extract_identifiers(employees, args.id_type)
+            if args.as_json:
+                print_json(ids)
+            else:
+                for identifier in ids:
+                    print(identifier)
         else:
-            for uid in uids:
-                print(uid)
+            print_json(response_data)
         return
 
     credentials = read_credentials(args.credentials, env_prefix="UCBHR_EMPLOYEES")
