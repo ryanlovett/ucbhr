@@ -25,6 +25,6 @@ async def get_hr_items(url, params, headers, item_type=None):
                 return []
             data = await r.json()
     if item_type is None:
-        return jmespath.search('response | [0]', data)
+        return jmespath.search("response | [0]", data)
     else:
-        return jmespath.search(f'response | [0].{item_type}', data)
+        return jmespath.search(f"response | [0].{item_type}", data)
