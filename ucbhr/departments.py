@@ -29,6 +29,12 @@ async def get_employees(app_id, app_key, dept_code, job_types=None, hr_status="A
         async with session.get(url, headers=headers, params=params) as r:
             if r.status == 404:
                 return {"response": []}
+            if r.status != 200:
+                body = await r.text()
+                raise aiohttp.ClientResponseError(
+                    r.request_info, r.history,
+                    status=r.status, message=body[:500]
+                )
             data = await r.json()
     logger.debug(f'employees: {data}')
     return data

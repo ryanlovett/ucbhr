@@ -16,13 +16,19 @@ departments_url = "https://gateway.api.berkeley.edu/hr/v4/departments"
 
 
 async def get_hr_items(url, params, headers, item_type=None):
-    """Get a list of items (enrollments, ) from the SIS."""
+    """Get a list of items from the HR API."""
     logger.debug(f"getting {item_type}")
     data = []
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers, params=params) as r:
             if r.status == 404:
                 return []
+            if r.status != 200:
+                body = await r.text()
+                raise aiohttp.ClientResponseError(
+                    r.request_info, r.history,
+                    status=r.status, message=body[:500]
+                )
             data = await r.json()
     if item_type is None:
         return jmespath.search("response | [0]", data)
