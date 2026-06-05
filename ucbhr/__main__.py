@@ -9,7 +9,7 @@ import logging
 import os
 import sys
 
-from ucbhr import jobs, hr, info
+from ucbhr import departments, jobs, hr, info
 
 # We use f-strings from python >= 3.6.
 assert sys.version_info >= (3, 7)
@@ -95,13 +95,11 @@ async def main():
     parser.add_argument(
         "-i",
         dest="identifier",
-        required=True,
         help="number uniquely identifying employee",
     )
     parser.add_argument(
         "-t",
         dest="type",
-        required=True,
         choices=["campus-uid", "hr-employee-id", "legacy-hr-employee-id"],
         default="campus-uid",
         type=str.lower,
@@ -120,8 +118,36 @@ async def main():
     subparsers = parser.add_subparsers(dest="command")
 
     jobs_parser = subparsers.add_parser("jobs", help="Get employee's jobs.")
+    jobs_parser.add_argument(
+        "-i",
+        dest="identifier",
+        required=True,
+        help="number uniquely identifying employee",
+    )
+    jobs_parser.add_argument(
+        "-t",
+        dest="type",
+        choices=["campus-uid", "hr-employee-id", "legacy-hr-employee-id"],
+        default="campus-uid",
+        type=str.lower,
+        help="id type",
+    )
 
     emails_parser = subparsers.add_parser("emails", help="Get employee's emails.")
+    emails_parser.add_argument(
+        "-i",
+        dest="identifier",
+        required=True,
+        help="number uniquely identifying employee",
+    )
+    emails_parser.add_argument(
+        "-t",
+        dest="type",
+        choices=["campus-uid", "hr-employee-id", "legacy-hr-employee-id"],
+        default="campus-uid",
+        type=str.lower,
+        help="id type",
+    )
     emails_parser.add_argument(
         "-c",
         dest="code",
@@ -131,6 +157,35 @@ async def main():
     )
 
     info_parser = subparsers.add_parser("info", help="Get employee's info.")
+    info_parser.add_argument(
+        "-i",
+        dest="identifier",
+        required=True,
+        help="number uniquely identifying employee",
+    )
+    info_parser.add_argument(
+        "-t",
+        dest="type",
+        choices=["campus-uid", "hr-employee-id", "legacy-hr-employee-id"],
+        default="campus-uid",
+        type=str.lower,
+        help="id type",
+    )
+
+    departments_parser = subparsers.add_parser(
+        "departments", help="Get employees in a department."
+    )
+    departments_parser.add_argument(
+        "--dept-code",
+        dest="dept_code",
+        required=True,
+        help="HR department code (e.g. PSTAT)",
+    )
+    departments_parser.add_argument(
+        "--job-types",
+        dest="job_types",
+        help="Comma-separated PPS appointment type codes",
+    )
 
     args = parser.parse_args()
 
@@ -139,8 +194,23 @@ async def main():
     elif args.debug:
         logger.setLevel(logging.DEBUG)
 
-    # read credentials from credentials file
-    credentials = read_credentials(args.credentials)
+    if args.command == "departments":
+        credentials = read_credentials(args.credentials, env_prefix="UCBHR_DEPARTMENTS")
+        employees = await departments.get_employees(
+            credentials["app_id"],
+            credentials["app_key"],
+            args.dept_code,
+            args.job_types,
+        )
+        uids = departments.extract_campus_uids(employees)
+        if args.as_json:
+            print_json(uids)
+        else:
+            for uid in uids:
+                print(uid)
+        return
+
+    credentials = read_credentials(args.credentials, env_prefix="UCBHR_EMPLOYEES")
 
     if args.command == "jobs":
         items = await jobs.get(
