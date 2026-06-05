@@ -42,9 +42,48 @@ def print_json(items):
     print(json.dumps(items, ensure_ascii=False, indent=4))
 
 
-def read_credentials(filename, required_keys=secret_keys):
-    """Read credentials from {filename}. Returns a dict."""
-    return read_json_data(filename, required_keys)
+def read_credentials(filename, required_keys=secret_keys, env_prefix=None):
+    """Read credentials from {filename} or env vars. Returns a dict.
+
+    Tries the JSON credentials file first. If it doesn't exist or is missing
+    keys, falls back to environment variables named {env_prefix}_ID and
+    {env_prefix}_KEY. Raises if neither source provides all required keys.
+    """
+    if os.path.exists(filename):
+        try:
+            return read_json_data(filename, required_keys)
+        except Exception:
+            pass
+
+    if env_prefix:
+        env_creds = {}
+        env_map = {
+            "app_id": f"{env_prefix}_ID",
+            "app_key": f"{env_prefix}_KEY",
+        }
+        for key in required_keys:
+            env_name = env_map.get(key)
+            if env_name and os.environ.get(env_name):
+                env_creds[key] = os.environ[env_name]
+
+        if len(env_creds) == len(required_keys):
+            return env_creds
+
+        missing = set(required_keys) - set(env_creds)
+        if env_creds:
+            raise Exception(
+                f"Missing credentials via {env_prefix}_ env vars: {missing}"
+            )
+    else:
+        missing = set(required_keys)
+
+    if os.path.exists(filename):
+        raise Exception(f"Missing parameters in {filename}: {missing}")
+    if env_prefix:
+        raise Exception(
+            f"Credentials not found: no {filename} and no {env_prefix}_ env vars set"
+        )
+    raise Exception(f"Credentials not found: no {filename}")
 
 
 ## main
